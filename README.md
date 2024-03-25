@@ -19,10 +19,20 @@ Convert your images easily!
 - TIFF
 
 ## Installation
+
+Ensure that you have Rust and Cargo installed. You can install them together [here](https://www.rust-lang.org/tools/install).
+
+### CLI
 Clone the repository and run:
 ```rust
-cargo build --release
+cargo build --release --features "headless"
 ```
+### GUI
+Clone the repository and run:
+```rust
+cargo build --release --features "gui"
+```
+
 Find the resulting executable in `/target/release`.
 
 ## Dependencies

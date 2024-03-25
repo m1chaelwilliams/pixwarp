@@ -1,3 +1,5 @@
+#![windows_subsystem = "windows"]
+
 mod prompt;
 mod gui;
 mod converter;
