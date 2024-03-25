@@ -15,3 +15,4 @@ rfd = "*"
 [features]
 default = ["gui"]
 gui = []
+headless = []
