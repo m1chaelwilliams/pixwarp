@@ -1,7 +1,7 @@
 # PixWarp Image Converter
-___
+Convert your images easily!
 
-Convert your images to formats easily!
+![Screenshot](screenshot.png)
 
 ## Supported Formats:
 - JPG
