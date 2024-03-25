@@ -3,15 +3,23 @@ mod gui;
 mod converter;
 
 use std::io;
-use std::path::Path;
-use colored::*;
+
 
 // personal modules
+#[cfg(feature = "headless")]
+use std::path::Path;
+#[cfg(feature = "headless")]
+use colored::*;
+#[cfg(feature = "headless")]
 use prompt::*;
-use gui::*;
+#[cfg(feature = "headless")]
 use converter::*;
+#[cfg(feature = "gui")]
+use gui::*;
+
 use eframe::*;
 
+#[cfg(feature = "headless")]
 fn run_headless() -> io::Result<()> {
     println!("--- Image Converter ---");
 
@@ -47,10 +55,15 @@ fn run_headless() -> io::Result<()> {
     Ok(())
 }
 
+#[cfg(feature = "gui")]
 fn run_gui() -> io::Result<()> {
+    use egui::{Vec2, ViewportBuilder};
     match run_native(
         "Image Converter", 
-        NativeOptions::default(), 
+        NativeOptions {
+            viewport: ViewportBuilder::default().with_inner_size(Vec2::new(400.0, 175.0)),
+            ..Default::default()
+        }, 
     Box::new(|cc| {
         Box::new(ConversionApp::new(cc))
     })) {
@@ -65,12 +78,12 @@ fn run_gui() -> io::Result<()> {
 fn main() -> io::Result<()> {
     #[cfg(feature = "headless")]
     if cfg!(feature = "headless") {
-        run_headless()?;
+        return run_headless();
     }
 
     #[cfg(feature = "gui")]
     if cfg!(feature = "gui") {
-        run_gui()?;
+        return run_gui();
     }
 
     Ok(())

@@ -1,6 +1,9 @@
 use egui::*;
 use eframe::*;
 use rfd::FileDialog;
+use std::path::Path;
+
+use crate::converter::{export_file, validate_file_exists, validate_path_exists};
 
 fn get_file() -> Option<String> {
 	if let Some(file) = FileDialog::new()
@@ -34,6 +37,8 @@ pub struct ConversionApp {
 	init_filepath: String,
 	out_dir: String,
 	out_name: String,
+	fields_valid: bool,
+	fields_checked: bool,
 }
 
 impl ConversionApp {
@@ -57,8 +62,8 @@ impl App for ConversionApp {
 					self.input_fields(ui)
 			});
 
-			ui.separator();
 			ui.add_space(15.0);
+			ui.separator();
 
 			ui.with_layout(Layout::right_to_left(Align::TOP), |ui| {
 				self.action_buttons(ui);
@@ -74,16 +79,40 @@ impl ConversionApp {
 				self.init_filepath.clear();
 				self.out_dir.clear();
 				self.out_name.clear();
+				self.fields_checked = false;
 			},
-			Message::Convert => (),
+			Message::Convert => {
+				if let Some(init_filepath) = validate_file_exists(self.init_filepath.clone()) {
+					let out_dir = Path::new(&self.out_dir);
+
+					if let Some(_) = validate_path_exists(self.out_dir.clone()) {
+						let out_filepath = out_dir.join(Path::new(&self.out_name));
+
+						match export_file(&init_filepath, &out_filepath.to_string_lossy().to_string()) {
+							Ok(_) => {
+								self.fields_valid = true;
+								self.fields_checked = false;
+								return;
+							},
+							Err(e) => {
+								println!("{}", e);
+							}
+						};
+					}
+				}
+				self.fields_checked = true;
+				self.fields_valid = false;
+			},
 			Message::LocateFilepath => {
 				if let Some(filepath) = get_file() {
 					self.init_filepath = filepath;
+					self.fields_checked = false;
 				}
 			},
 			Message::LocateOutDir => {
 				if let Some(dir) = get_dir() {
 					self.out_dir = dir;
+					self.fields_checked = false;
 				}
 			},
 		}
@@ -105,7 +134,7 @@ impl ConversionApp {
 		ui.add(
 			egui::TextEdit::singleline(&mut self.out_dir)
 				.min_size(Vec2::new(150.0, 1.0))
-				.hint_text("output/directory/")	
+				.hint_text("output/directory/")
 		);
 		if ui.button("Locate").clicked() {
 			self.on_message(Message::LocateOutDir);
@@ -128,5 +157,9 @@ impl ConversionApp {
 		if ui.button("Convert").clicked() {
 			self.on_message(Message::Convert);
 		};
+
+		if self.fields_checked && !self.fields_valid {
+			ui.colored_label(Color32::from_rgb(255, 0, 0), "Fields are invalid.");
+		}
 	}
 }

@@ -1,5 +1,7 @@
+#[cfg(feature = "headless")]
 use std::{io, str::FromStr};
 
+#[cfg(feature = "headless")]
 pub fn io_get_strip() -> Option<String> {
     let mut buf = String::new();
 
@@ -9,6 +11,7 @@ pub fn io_get_strip() -> Option<String> {
     }
 }
 
+#[cfg(feature = "headless")]
 pub fn prompt<T, F>(validate_fn: F) -> T 
 where
     T: FromStr,
