@@ -5,8 +5,8 @@ Convert your images easily!
 ![GUI Screenshot](guiscreenshot.png "Screenshot of the GUI (WIP)")
 
 ## Status
-- CLI: Working!
-- GUI: WIP (50%)
+- CLI: **Working!**
+- GUI: **Working!**
 
 ## Supported Formats:
 - JPG
