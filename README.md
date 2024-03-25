@@ -1,7 +1,12 @@
 # PixWarp Image Converter
 Convert your images easily!
 
-![Screenshot](screenshot.png)
+![Screenshot](screenshot.png "screenshot of the CLI")
+![GUI Screenshot](guiscreenshot.png "Screenshot of the GUI (WIP)")
+
+## Status
+- CLI: Working!
+- GUI: WIP (50%)
 
 ## Supported Formats:
 - JPG
