@@ -1,4 +1,5 @@
 mod prompt;
+mod gui;
 
 use std::io;
 use std::path::Path;
@@ -6,6 +7,8 @@ use colored::*;
 
 // personal modules
 use prompt::*;
+use gui::*;
+use eframe::*;
 
 use image;
 
@@ -22,7 +25,7 @@ fn supports_format(extension: &str) -> bool {
     }
 }
 
-fn main() -> io::Result<()> {
+fn run_headless() -> io::Result<()> {
     println!("--- Image Converter ---");
 
     println!("{} Enter an filepath (including filename & extension):", ">".green());
@@ -93,6 +96,34 @@ fn main() -> io::Result<()> {
         Err(e) => println!("{}", e)
     };
     println!("{} {}", "Converted! output in:".green(), out_dir.to_string_lossy().cyan().bold());
+    Ok(())
+}
+
+fn run_gui() -> io::Result<()> {
+    match run_native(
+        "Image Converter", 
+        NativeOptions::default(), 
+    Box::new(|cc| {
+        Box::new(ConversionApp::new(cc))
+    })) {
+        Ok(_) => Ok(()),
+        Err(e) => {
+            println!("{}", e);
+            Err(io::Error::new(io::ErrorKind::Other, "Failed to run GUI"))
+        }
+    }
+}
+
+fn main() -> io::Result<()> {
+    #[cfg(feature = "headless")]
+    if cfg!(feature = "headless") {
+        run_headless()?;
+    }
+
+    #[cfg(feature = "gui")]
+    if cfg!(feature = "gui") {
+        run_gui()?;
+    }
 
     Ok(())
 }

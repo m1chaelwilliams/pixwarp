@@ -8,3 +8,10 @@ edition = "2021"
 [dependencies]
 image = "*"
 colored = "*"
+egui = "*"
+eframe = "*"
+rfd = "*"
+
+[features]
+default = ["gui"]
+gui = []
