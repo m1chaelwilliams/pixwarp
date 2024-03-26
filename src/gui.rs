@@ -3,12 +3,17 @@ use eframe::*;
 use rfd::FileDialog;
 use std::path::Path;
 
-use crate::converter::{export_file, validate_file_exists, validate_path_exists};
+use crate::converter::{export_file, validate_file_exists, validate_new_file, validate_path_exists};
 
 fn get_file() -> Option<String> {
 	if let Some(file) = FileDialog::new()
 		.add_filter("png", &["png", "PNG"])
-		.add_filter("jpg", &["jpg", "JPG"])
+		.add_filter("jpg", &["jpg", "jpeg", "JPG", "JPEG"])
+		.add_filter("bmp", &["bmp", "BMP"])
+		.add_filter("tiff", &["tiff", "TIFF"])
+		.add_filter("ico", &["ico", "ICO"])
+		.add_filter("avif", &["avif", "AVIF"])
+		.add_filter("webp", &["webp", "WEBP"])
 		.pick_file()
 	{
 		return Some(file.to_string_lossy().into_owned().to_string());
@@ -30,6 +35,7 @@ pub enum Message {
 	Convert,
 	LocateFilepath,
 	LocateOutDir,
+	ClearErrors,
 }
 
 #[derive (Default)]
@@ -39,6 +45,7 @@ pub struct ConversionApp {
 	out_name: String,
 	fields_valid: bool,
 	fields_checked: bool,
+	complaint: String,
 }
 
 impl ConversionApp {
@@ -64,6 +71,7 @@ impl App for ConversionApp {
 
 			ui.add_space(15.0);
 			ui.separator();
+			ui.add_space(5.0);
 
 			ui.with_layout(Layout::right_to_left(Align::TOP), |ui| {
 				self.action_buttons(ui);
@@ -86,19 +94,29 @@ impl ConversionApp {
 					let out_dir = Path::new(&self.out_dir);
 
 					if let Some(_) = validate_path_exists(self.out_dir.clone()) {
-						let out_filepath = out_dir.join(Path::new(&self.out_name));
+						if let Some(_) = validate_new_file(self.out_name.clone()) {
+							
+							let out_filepath = out_dir.join(Path::new(&self.out_name));
 
-						match export_file(&init_filepath, &out_filepath.to_string_lossy().to_string()) {
-							Ok(_) => {
-								self.fields_valid = true;
-								self.fields_checked = false;
-								return;
-							},
-							Err(e) => {
-								println!("{}", e);
-							}
-						};
+							match export_file(&init_filepath, &out_filepath.to_string_lossy().to_string()) {
+								Ok(_) => {
+									self.fields_valid = true;
+									self.fields_checked = false;
+									return;
+								},
+								Err(e) => {
+									println!("{}", e);
+								}
+							};
+
+						} else {
+							self.complaint = "Output filename is not valid.".to_string();
+						}
+					} else {
+						self.complaint = "Output filepath does not exist".to_string();
 					}
+				} else {
+					self.complaint = "Initial filepath does not exist".to_string();
 				}
 				self.fields_checked = true;
 				self.fields_valid = false;
@@ -115,38 +133,49 @@ impl ConversionApp {
 					self.fields_checked = false;
 				}
 			},
+			Message::ClearErrors => {
+				self.fields_checked = false;
+				self.fields_valid = false;
+				self.complaint.clear();
+			}
 		}
 	}
 
 	fn input_fields(&mut self, ui: &mut Ui) {
 		ui.label("File to Convert:");
-		ui.add(
+		if ui.add(
 			egui::TextEdit::singleline(&mut self.init_filepath)
 				.min_size(Vec2::new(150.0, 1.0))
 				.hint_text("path/to/example.jpg")	
-		);
+		).changed() {
+			self.on_message(Message::ClearErrors);
+		};
 		if ui.button("Locate").clicked() {
 			self.on_message(Message::LocateFilepath);
 		};
 		ui.end_row();
 
 		ui.label("Output Directory:");
-		ui.add(
+		if ui.add(
 			egui::TextEdit::singleline(&mut self.out_dir)
 				.min_size(Vec2::new(150.0, 1.0))
 				.hint_text("output/directory/")
-		);
+		).changed() {
+			self.on_message(Message::ClearErrors);
+		};
 		if ui.button("Locate").clicked() {
 			self.on_message(Message::LocateOutDir);
 		};
 		ui.end_row();
 
 		ui.label("Output Name:");
-		ui.add(
+		if ui.add(
 			egui::TextEdit::singleline(&mut self.out_name)
 				.min_size(Vec2::new(150.0, 1.0))
 				.hint_text("Example.jpg")	
-		);
+		).changed() {
+			self.on_message(Message::ClearErrors);
+		};
 		ui.end_row();
 	}
 
@@ -159,7 +188,7 @@ impl ConversionApp {
 		};
 
 		if self.fields_checked && !self.fields_valid {
-			ui.colored_label(Color32::from_rgb(255, 0, 0), "Fields are invalid.");
+			ui.colored_label(Color32::from_rgb(255, 0, 0), &self.complaint);
 		}
 	}
 }

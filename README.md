@@ -1,8 +1,10 @@
 # PixWarp Image Converter
 Convert your images easily!
 
-![Screenshot](screenshot.png "screenshot of the CLI")
-![GUI Screenshot](guiscreenshot.png "Screenshot of the GUI (WIP)")
+*GUI*
+![GUI Demo](resources/gui_demo.gif "demo of the GUI app")
+*CLI*
+![Screenshot](resources/screenshot.png "screenshot of the CLI")
 
 ## Status
 - CLI: **Working!**
@@ -32,6 +34,8 @@ Clone the repository and run:
 ```rust
 cargo build --release --features "gui"
 ```
+
+After compiling for both builds is located in `/target/release/`. Feel free to move the exe to a more convenient location. There are no external resources to worry about!
 
 Find the resulting executable in `/target/release`.
 

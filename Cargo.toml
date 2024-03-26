@@ -7,12 +7,12 @@ edition = "2021"
 
 [dependencies]
 image = "*"
-colored = "*"
-egui = "*"
-eframe = "*"
-rfd = "*"
+colored = {version = "*", optional = true}
+egui = {version = "*", optional = true}
+eframe = {version = "*", optional = true}
+rfd = {version = "*", optional = true}
 
 [features]
 default = ["gui"]
-gui = []
-headless = []
+gui = ["dep:eframe", "dep:egui", "dep:rfd"]
+headless = ["dep:colored"]

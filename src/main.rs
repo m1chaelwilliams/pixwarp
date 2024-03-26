@@ -1,24 +1,28 @@
-#![windows_subsystem = "windows"]
-
 mod prompt;
+#[cfg(feature = "gui")]
 mod gui;
 mod converter;
 
-use std::io;
-
+#[cfg(windows)]
+use std::{ffi::c_ulong, io};
 
 // personal modules
 #[cfg(feature = "headless")]
 use std::path::Path;
+
 #[cfg(feature = "headless")]
 use colored::*;
+
 #[cfg(feature = "headless")]
 use prompt::*;
+
 #[cfg(feature = "headless")]
 use converter::*;
+
 #[cfg(feature = "gui")]
 use gui::*;
 
+#[cfg(feature = "gui")]
 use eframe::*;
 
 #[cfg(feature = "headless")]
@@ -43,27 +47,29 @@ fn run_headless() -> io::Result<()> {
     let out_filepath = out_dir.join(out_file);
     let out_filepath_raw = out_filepath.to_string_lossy();
 
+    println!("{}", "Converting...".yellow());
+
     let _img_result = export_file(&init_filepath_raw, &out_filepath_raw.to_string());
 
-    // let img = image::io::Reader::open(init_path)?
-    //     .decode().unwrap();
-
-    println!("{}", "Converting...".yellow());
-    // match img.save(out_dir.join(out_file).as_path()) {
-    //     Ok(_) => (),
-    //     Err(e) => println!("{}", e)
-    // };
     println!("{} {}", "Converted! output in:".green(), out_dir.to_string_lossy().cyan().bold());
     Ok(())
 }
 
 #[cfg(feature = "gui")]
 fn run_gui() -> io::Result<()> {
-    use egui::{Vec2, ViewportBuilder};
+    use egui::{IconData, ViewportBuilder, Vec2};
+
+    // empty icon (because I don't have one haha)
+    let custom_icon = IconData {
+        rgba: vec![0, 0, 0, 0],
+        width: 1,
+        height: 1
+    };
+
     match run_native(
         "Image Converter", 
         NativeOptions {
-            viewport: ViewportBuilder::default().with_inner_size(Vec2::new(400.0, 175.0)),
+            viewport: ViewportBuilder::default().with_inner_size(Vec2::new(400.0, 180.0)).with_icon(custom_icon),
             ..Default::default()
         }, 
     Box::new(|cc| {
@@ -77,7 +83,25 @@ fn run_gui() -> io::Result<()> {
     }
 }
 
+extern "system" {
+    fn FreeConsole() -> c_ulong;
+}
+
+// free the console that automatically opens on windows
+#[cfg(windows)]
+fn free_console() {
+    unsafe {
+        FreeConsole();
+    }
+}
+
+#[cfg(not(windows))]
+fn free_console() {
+    
+}
+
 fn main() -> io::Result<()> {
+
     #[cfg(feature = "headless")]
     if cfg!(feature = "headless") {
         return run_headless();
@@ -85,6 +109,10 @@ fn main() -> io::Result<()> {
 
     #[cfg(feature = "gui")]
     if cfg!(feature = "gui") {
+
+        // freeing the terminal
+        free_console();
+        
         return run_gui();
     }
 

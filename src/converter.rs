@@ -1,5 +1,6 @@
-use std::path::Path;
+#[cfg(feature = "headless")]
 use colored::*;
+use std::path::Path;
 use image::{self, DynamicImage};
 
 pub fn supports_format(extension: &str) -> bool {
@@ -24,11 +25,13 @@ pub fn validate_file_exists(response: String) -> Option<String> {
 
 			if supports_format(&extension_str.into_owned().as_str()) {
 				return Some(response);
-			} else {
-				println!("{}", "File type not supported.".red().bold());
 			}
+			#[cfg(feature = "headless")]
+			println!("{}", "File type not supported.".red().bold());
+			return None
 		}
 	}
+	#[cfg(feature = "headless")]
 	println!("{}", "Please enter a valid filepath.".red().bold());
 	return None
 }
@@ -39,6 +42,7 @@ pub fn validate_path_exists(response: String) -> Option<String> {
 	if path.exists() {
 		return Some(response);
 	}
+	#[cfg(feature = "headless")]
 	println!("{}", "Please enter a valid filepath.".red().bold());
 	None
 }
@@ -55,14 +59,17 @@ pub fn validate_new_file(response: String) -> Option<String> {
 			if supports_format(&extension_str.into_owned().as_str()) {
 				return Some(response);
 			} else {
+				#[cfg(feature = "headless")]
 				println!("{}", "File type not supported.".red().bold());
 				return None;
 			}
 		} else {
+			#[cfg(feature = "headless")]
 			println!("{}", "Please enter a valid filename".red().bold());
 			return None;
 		}
 	}
+	#[cfg(feature = "headless")]
 	println!("{}", "Name must not be blank.".red().bold());
 	None
 }
