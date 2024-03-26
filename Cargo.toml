@@ -13,6 +13,6 @@ eframe = {version = "*", optional = true}
 rfd = {version = "*", optional = true}
 
 [features]
-default = ["gui"]
+default = []
 gui = ["dep:eframe", "dep:egui", "dep:rfd"]
 headless = ["dep:colored"]

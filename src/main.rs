@@ -3,6 +3,7 @@ mod prompt;
 mod gui;
 mod converter;
 
+#[cfg(feature = "gui")]
 #[cfg(windows)]
 use std::ffi::c_ulong;
 
@@ -69,7 +70,7 @@ fn run_gui() -> io::Result<()> {
     };
 
     match run_native(
-        "Image Converter", 
+        "PixWarp", 
         NativeOptions {
             viewport: ViewportBuilder::default().with_inner_size(Vec2::new(400.0, 180.0)).with_icon(custom_icon),
             ..Default::default()
@@ -85,12 +86,14 @@ fn run_gui() -> io::Result<()> {
     }
 }
 
+#[cfg(feature = "gui")]
 #[cfg(windows)]
 extern "system" {
     fn FreeConsole() -> c_ulong;
 }
 
 // free the console that automatically opens on windows
+#[cfg(feature = "gui")]
 #[cfg(windows)]
 fn free_console() {
     unsafe {

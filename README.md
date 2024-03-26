@@ -40,14 +40,18 @@ After compiling for both builds is located in `/target/release/`. Feel free to m
 Find the resulting executable in `/target/release`.
 
 ## Dependencies
-- [image](https://github.com/image-rs/image)
-- [colored](https://github.com/colored-rs/colored)
+- [image](https://github.com/image-rs/image) - All the actual conversion work
+- [colored](https://github.com/colored-rs/colored) - Colored terminal output
+- [eframe](https://github.com/emilk/egui/tree/master/crates/eframe) - Window management + more
+- [egui](https://github.com/emilk/egui/tree/master) - GUI library
+- [rfd](https://github.com/PolyMeilex/rfd) - Cross-platform file dialog
 
 ## License
 This software does not have its own license. It abides and follows the guidelines of its dependencies.
 
 ## TODO
-I plan on adding an optional GUI. There will be compilation options for both headless and not.
+I would like to add `HEIC` support in the future.
 
 ## Author
 Michael Williams
+[Website](https://codingwithsphere.com)
