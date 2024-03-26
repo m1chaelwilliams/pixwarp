@@ -4,7 +4,9 @@ mod gui;
 mod converter;
 
 #[cfg(windows)]
-use std::{ffi::c_ulong, io};
+use std::ffi::c_ulong;
+
+use std::io;
 
 // personal modules
 #[cfg(feature = "headless")]
@@ -18,8 +20,6 @@ use prompt::*;
 
 #[cfg(feature = "headless")]
 use converter::*;
-
-use std::io;
 
 #[cfg(feature = "gui")]
 use gui::*;
