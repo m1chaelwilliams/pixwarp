@@ -19,6 +19,8 @@ use prompt::*;
 #[cfg(feature = "headless")]
 use converter::*;
 
+use std::io;
+
 #[cfg(feature = "gui")]
 use gui::*;
 
@@ -83,6 +85,7 @@ fn run_gui() -> io::Result<()> {
     }
 }
 
+#[cfg(windows)]
 extern "system" {
     fn FreeConsole() -> c_ulong;
 }
